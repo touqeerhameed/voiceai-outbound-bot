@@ -1316,7 +1316,7 @@ export async function get_business_jobs_Schedule(active_calls) {
       logMessage('** Found active_calls_count :', active_calls);
       logMessage('Found Queue JOBS result.message.data:', result.message.data);
 
-      await triggerOutboundCall(result.message.data);
+      await triggerOutboundCall(result.message);
     }else
     {
       //console.log('NO Outbound Call record found');

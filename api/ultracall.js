@@ -198,21 +198,27 @@ export async function deleteCall_U(callId,UVdate) {
  
 
  //checkis this used
-export async function createUltravoxCall(job,use_knowlege_base,knowlege_base_id,UVdate) {
+export async function createUltravoxCall(job,ai_tags_dictionary,ai_settings,UVdate) {
   try {
     //console.log('ULTRAVOX_API_KEY here:', ULTRAVOX_API_KEY );
     // logMessage('ULTRAVOX_API_KEY here:', ULTRAVOX_API_KEY);
     //console.log('ULTRAVOX_OUTBOUND_API_URL:', ULTRAVOX_OUTBOUND_API_URL);
+    // const use_knowlege_base=job.use_knowlege_base
+    // const knowlege_base_id=job.knowlege_base_id;
+
+    logMessage('ai_tags_dictionary: ',ai_tags_dictionary)
+    logMessage('ai_tags_dictionary: ',ai_settings)
+
     logMessage('ULTRAVOX_OUTBOUND_API_URL:', ULTRAVOX_OUTBOUND_API_URL);
     if ( !ULTRAVOX_OUTBOUND_API_URL) {
       throw new Error('Missing Ultravox configuration - check environment variables');
     }
     logMessage(' createUltravoxCall job:', job);
-    logMessage(' use_knowlege_base:', use_knowlege_base);
-    logMessage(' knowlege_base_id:', knowlege_base_id);
-    //console.log('job dat:', job);
+    // logMessage(' use_knowlege_base:', use_knowlege_base);
+    // logMessage(' knowlege_base_id:', knowlege_base_id);
+    // //console.log('job dat:', job);
    
-    const payload = buildUltravoxCallConfig(job,use_knowlege_base,knowlege_base_id); // Store the payload
+    const payload = buildUltravoxCallConfig(job,ai_tags_dictionary,ai_settings); // Store the payload
     //console.log('ULTRAVOX_CALL_CONFIG complete:', payload);
     logMessage(' ULTRAVOX_CALL_CONFIG complete:', payload);
 
@@ -267,7 +273,7 @@ export async function createUltravoxCall(job,use_knowlege_base,knowlege_base_id,
     //throw error;
   }
 }  
-async function initiateCall(job) {
+async function initiateCall(job,ai_tags_dictionary,ai_settings) {
 try {
   
   let TWILIO_NUMBER=job.telecom_phone_number;     
@@ -281,14 +287,16 @@ try {
   const TELECOME_PHONE_NUMBER=TWILIO_NUMBER;//job.telecom_phone_number;
   const COMPANYID=job.business_id;
 
+
   const telecom_credential = await GET_teleCreden(TELECOME_PHONE_NUMBER,COMPANYID);
   if (!telecom_credential) {
+    logMessage('Telecom credential not found for the provided phone number.')
     throw new Error('Telecom credential not found for the provided phone number.');
   }
-  const use_knowlege_base =  telecom_credential?.message?.data?.use_knowlege_base;
-  const knowlege_base_id =  telecom_credential?.message?.data?.knowlege_base_id;
+  // const use_knowlege_base =  telecom_credential?.message?.data?.use_knowlege_base;
+  // const knowlege_base_id =  telecom_credential?.message?.data?.knowlege_base_id;
 
-  const ultravoxResponse = await createUltravoxCall(job,use_knowlege_base,knowlege_base_id,UVdate);
+  const ultravoxResponse = await createUltravoxCall(job,ai_tags_dictionary,ai_settings,UVdate);
   logMessage('🔍 Full Ultravox Call Response:', JSON.stringify(ultravoxResponse, null, 2));    
   //console.log('🔍 Full Ultravox Call Response:', JSON.stringify(ultravoxResponse, null, 2));
   const { joinUrl,callId } = ultravoxResponse;
@@ -377,7 +385,10 @@ try {
 }
 } 
 
- export async function triggerOutboundCall(jobs) {
+ export async function triggerOutboundCall(message) {
+  const jobs =message.data;
+  const ai_tags_dictionary =message.ai_tags_dictionary;
+  const ai_settings =message.ai_settings;
   if (!Array.isArray(jobs)) {
     console.log("🚨 Expected an array of jobs but received:", typeof jobs);
     return;
@@ -396,7 +407,7 @@ try {
       if(job.credit_business>0 ) //CHECK IF CREDIT IS AVAILABLE
       {
 
-        const call =await initiateCall(job);        
+        const call =await initiateCall(job,ai_tags_dictionary,ai_settings);        
         await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_OUTBOUND_CALL* 1000)); // Convert seconds to milliseconds
       }
       else

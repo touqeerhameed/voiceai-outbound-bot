@@ -16,4 +16,4 @@ export const CALL_STATUS_LOGGER = process.env.CALL_STATUS_LOGGER;
 export const OUTBOUND_SERVER_LOG_ENABLED = process.env.OUTBOUND_SERVER_LOG_ENABLED;
 
 
-export const PORT = process.env.PORT || 3006;
+export const PORT = process.env.PORT || 3016;
