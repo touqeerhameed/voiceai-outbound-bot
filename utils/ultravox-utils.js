@@ -561,7 +561,12 @@ export function buildUltravoxCallConfig(job, ai_tags_dictionary, ai_settings) {
     const FROM = job.telecom_phone_number;
     const TO = job.call_phone_no;
 
-    logMessage('Phone numbers - FROM:', FROM, 'TO:', TO);
+    // logMessage('Phone numbers - FROM:', FROM, 'TO:', TO);
+    // logMessage('job.full_name::  ',job.full_name )
+    // logMessage('job.email_address::  ',job.job_email_address )
+    // logMessage('job.call_phone_no::  ',job.call_phone_no )
+
+ 
 
     // Build prompt with error handling
     let FINAL_PROMPT;
@@ -576,7 +581,8 @@ export function buildUltravoxCallConfig(job, ai_tags_dictionary, ai_settings) {
         ai_settings?.kpi_assessment,
         //REPLACEMENT
         job.is_record_disclaimer, job.record_disclaimer, FROM, ai_tags_dictionary,
-        job.website, job.companyname, job.agent_name
+        job.website, job.companyname, job.agent_name,job.greeting,job.business_services,job.business_description,
+        job.full_name,job.job_email_address,job.call_phone_no
       );
       
       if (!FINAL_PROMPT) {

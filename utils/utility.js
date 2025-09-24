@@ -7,7 +7,8 @@ export function MAKE_PROMPT(
     persona_tone, core_objective, key_rules_constraints, unresponsive_spam, tool_functions, ai_datetime_handling, prompt_misc,
     call_flow, business_knowledge_base, example_scenario, table_faqs, pronunciation, kpi_assessment,
     //REPLACEMENT
-    is_record_disclaimer, record_disclaimer, FROM, ai_tags_dictionary, website, company_name, agent_name) 
+    is_record_disclaimer, record_disclaimer, FROM, ai_tags_dictionary, website, company_name, agent_name,
+    greeting,business_services,business_description,full_name,email_address,call_phonenumber ) 
   {
     
      
@@ -45,8 +46,9 @@ export function MAKE_PROMPT(
       prompt = PROMPT_REPLACEMENT(prompt, FROM, ai_tags_dictionary);
     //   logMessage(`After PROMPT_REPLACEMENT replacement prompt : ${prompt}`);
       
-      prompt = PROMPT_EXPLICIT_REPLACEMENT(prompt, is_record_disclaimer, record_disclaimer, website, company_name, agent_name);
-    //   logMessage(`AFTER PROMPT_EXPLICIT_REPLACEMENT :prompt : ${prompt}`);
+      prompt = PROMPT_EXPLICIT_REPLACEMENT(prompt, is_record_disclaimer, record_disclaimer, website, company_name, agent_name,greeting,business_services,business_description,full_name,email_address,call_phonenumber);
+                                          
+      logMessage(`FINAL PROMPT **  :prompt : ${prompt}`);
       
       return prompt;
       
@@ -58,8 +60,31 @@ export function MAKE_PROMPT(
 }
  
 
-function PROMPT_EXPLICIT_REPLACEMENT(prompt, is_record_disclaimer, record_disclaimer, website, company_name, agent_name) {
+function PROMPT_EXPLICIT_REPLACEMENT(prompt, is_record_disclaimer, record_disclaimer, website, company_name, agent_name,greeting,business_services,business_description,full_name,email_address,call_phonenumber) {
+                                     
   try {
+
+     logMessage("SHOW ME PROMPT CONDITION", prompt);
+
+    //  if (prompt.includes('[AGENT_NAME]'))
+    //  {
+    //   logMessage("Yes it exist [AGENT_NAME] ",agent_name);
+
+    //  }
+
+
+     
+    //  if (prompt.includes('[FULLNAME]'))
+    //  {
+    //   logMessage("Yes it exist [FULLNAME] ",full_name);
+
+    //  }
+
+      if (prompt.includes('[GREETING]') && greeting && greeting.trim() !== '') {
+      prompt = prompt.replace(/\[GREETING\]/g, greeting);
+    }
+
+
     // Handle [Disclaimer] replacement
     if (is_record_disclaimer === true || is_record_disclaimer === 1) {
       if (record_disclaimer && record_disclaimer.trim() !== '') {
@@ -84,9 +109,41 @@ function PROMPT_EXPLICIT_REPLACEMENT(prompt, is_record_disclaimer, record_discla
       prompt = prompt.replace(/\[AGENT_NAME\]/g, agent_name);
     }
 
+   
+
+    if (prompt.includes('[BUSINESS_OVERVIEW]') && business_description && business_description.trim() !== '') {
+      prompt = prompt.replace(/\[BUSINESS_OVERVIEW\]/g, business_description);
+    }
+
+     if (prompt.includes('[BUSINESS_SERVICES]') && business_services && business_services.trim() !== '') {
+      prompt = prompt.replace(/\[BUSINESS_SERVICES\]/g, business_services);
+    }
+
+    //if (prompt.includes('[FULLNAME]') && full_name && full_name.trim() !== '') {
+    if (prompt.includes('[FULLNAME]')  && full_name && full_name.trim() !== '') {
+      logMessage("try for [FULLNAME]",full_name);
+      prompt = prompt.replace(/\[FULLNAME\]/g, full_name);
+    }
+
+     if (prompt.includes('[EMAILADDRESS]') && email_address && email_address.trim() !== '') {
+      logMessage("try for [EMAILADDRESS]",email_address);
+      prompt = prompt.replace(/\[EMAILADDRESS\]/g, email_address);
+    }
+
+     if (prompt.includes('[CALLPHONENO]') && call_phonenumber && call_phonenumber.trim() !== '') {
+       logMessage("try for [CALLPHONENO]",call_phonenumber)
+      prompt = prompt.replace(/\[CALLPHONENO\]/g, call_phonenumber);
+    }
+
+
+     
+
     return prompt;
 
   } catch (error) {
+    logMessage("Error in PROMPT_EXPLICIT_REPLACEMENT",error)
+    logMessage("Error in PROMPT_EXPLICIT_REPLACEMENT",error.message)
+
     console.log('Error in PROMPT_EXPLICIT_REPLACEMENT:', error.message);
     return prompt; // Return original prompt if error occurs
   }
