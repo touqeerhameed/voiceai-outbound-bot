@@ -582,7 +582,7 @@ export function buildUltravoxCallConfig(job, ai_tags_dictionary, ai_settings) {
         //REPLACEMENT
         job.is_record_disclaimer, job.record_disclaimer, FROM, ai_tags_dictionary,
         job.website, job.companyname, job.agent_name,job.greeting,job.business_services,job.business_description,
-        job.full_name,job.job_email_address,job.call_phone_no
+        job.full_name,job.job_email_address,job.call_phone_no,job.opening_hours
       );
       
       if (!FINAL_PROMPT) {

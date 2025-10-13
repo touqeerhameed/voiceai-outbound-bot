@@ -8,7 +8,7 @@ export function MAKE_PROMPT(
     call_flow, business_knowledge_base, example_scenario, table_faqs, pronunciation, kpi_assessment,
     //REPLACEMENT
     is_record_disclaimer, record_disclaimer, FROM, ai_tags_dictionary, website, company_name, agent_name,
-    greeting,business_services,business_description,full_name,email_address,call_phonenumber ) 
+    greeting,business_services,business_description,full_name,email_address,call_phonenumber,opening_hours ) 
   {
     
      
@@ -46,7 +46,8 @@ export function MAKE_PROMPT(
       prompt = PROMPT_REPLACEMENT(prompt, FROM, ai_tags_dictionary);
     //   logMessage(`After PROMPT_REPLACEMENT replacement prompt : ${prompt}`);
       
-      prompt = PROMPT_EXPLICIT_REPLACEMENT(prompt, is_record_disclaimer, record_disclaimer, website, company_name, agent_name,greeting,business_services,business_description,full_name,email_address,call_phonenumber);
+      prompt = PROMPT_EXPLICIT_REPLACEMENT(prompt, is_record_disclaimer, record_disclaimer, website, company_name, agent_name,greeting,business_services,business_description,full_name,email_address,call_phonenumber,opening_hours);
+      prompt = PROMPT_EXPLICIT_REPLACEMENT(prompt, is_record_disclaimer, record_disclaimer, website, company_name, agent_name,greeting,business_services,business_description,full_name,email_address,call_phonenumber,opening_hours);
                                           
       logMessage(`FINAL PROMPT **  :prompt : ${prompt}`);
       
@@ -60,11 +61,11 @@ export function MAKE_PROMPT(
 }
  
 
-function PROMPT_EXPLICIT_REPLACEMENT(prompt, is_record_disclaimer, record_disclaimer, website, company_name, agent_name,greeting,business_services,business_description,full_name,email_address,call_phonenumber) {
+function PROMPT_EXPLICIT_REPLACEMENT(prompt, is_record_disclaimer, record_disclaimer, website, company_name, agent_name,greeting,business_services,business_description,full_name,email_address,call_phonenumber,opening_hours) {
                                      
   try {
 
-     logMessage("SHOW ME PROMPT CONDITION", prompt);
+    //  logMessage("SHOW ME PROMPT CONDITION", prompt);
 
     //  if (prompt.includes('[AGENT_NAME]'))
     //  {
@@ -87,10 +88,16 @@ function PROMPT_EXPLICIT_REPLACEMENT(prompt, is_record_disclaimer, record_discla
 
     // Handle [Disclaimer] replacement
     if (is_record_disclaimer === true || is_record_disclaimer === 1) {
-      if (record_disclaimer && record_disclaimer.trim() !== '') {
-        if (prompt.includes('[Disclaimer]')) {
-          prompt = prompt.replace(/\[Disclaimer\]/g, record_disclaimer);
-        }
+    //   if (record_disclaimer && record_disclaimer.trim() !== '') {
+    if (prompt.includes('[Disclaimer]')) {
+      prompt = prompt.replace(/\[Disclaimer\]/g, record_disclaimer);
+    }
+    //   }
+     }
+     else {
+
+      if (prompt.includes('[Disclaimer]')) {          
+        prompt = prompt.replace(/\[Disclaimer\]/g, "");                                    
       }
     }
 
@@ -121,21 +128,23 @@ function PROMPT_EXPLICIT_REPLACEMENT(prompt, is_record_disclaimer, record_discla
 
     //if (prompt.includes('[FULLNAME]') && full_name && full_name.trim() !== '') {
     if (prompt.includes('[FULLNAME]')  && full_name && full_name.trim() !== '') {
-      logMessage("try for [FULLNAME]",full_name);
+      // logMessage("try for [FULLNAME]",full_name);
       prompt = prompt.replace(/\[FULLNAME\]/g, full_name);
     }
 
      if (prompt.includes('[EMAILADDRESS]') && email_address && email_address.trim() !== '') {
-      logMessage("try for [EMAILADDRESS]",email_address);
+      // logMessage("try for [EMAILADDRESS]",email_address);
       prompt = prompt.replace(/\[EMAILADDRESS\]/g, email_address);
     }
 
      if (prompt.includes('[CALLPHONENO]') && call_phonenumber && call_phonenumber.trim() !== '') {
-       logMessage("try for [CALLPHONENO]",call_phonenumber)
+      //  logMessage("try for [CALLPHONENO]",call_phonenumber)
       prompt = prompt.replace(/\[CALLPHONENO\]/g, call_phonenumber);
     }
 
-
+    if (prompt.includes('[OPENING_HOURS]') && opening_hours && opening_hours.trim() !== '') {
+      prompt = prompt.replace(/\[OPENING_HOURS\]/g, opening_hours);
+    }
      
 
     return prompt;
