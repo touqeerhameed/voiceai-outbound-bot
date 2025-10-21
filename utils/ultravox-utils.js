@@ -612,12 +612,18 @@ export function buildUltravoxCallConfig(job, ai_tags_dictionary, ai_settings) {
       IsRecordingstring = "false";
       IsEmailnotistring = "false";
     }
-
+    //max_call_dur_insec_sch  takes this if in case of scheduler priority set to campaign
     // Process duration with error handling
     let maxDurationnow;
     try {
-      maxDurationnow = `${job.max_call_dur_insec || 300}s`;
-      console.log('Max duration set to:', maxDurationnow);
+      // Check if scheduler priority is Campaign, use max_call_dur_insec_sch, otherwise use max_call_dur_insec
+      if (job.scheduler_priority_title === 'Campaign') {
+        maxDurationnow = `${job.max_call_dur_insec_sch || 300}s`;
+        console.log('Max duration set to (Campaign):', maxDurationnow);
+      } else {
+        maxDurationnow = `${job.max_call_dur_insec || 300}s`;
+        console.log('Max duration set to:', maxDurationnow);
+      }
     } catch (durationError) {
 
       logMessage('Error processing duration:', durationError.message);
