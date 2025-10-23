@@ -356,7 +356,7 @@ const transferCallTool = (FROM, TO, ISCALLFORWARDING, FORWARDING_MOBILE_NUMBER, 
   }
 });
 
-const bookAppointmentTool = (FROM, TO, IS_APPOINTMENT_EMAIL) => ({
+const bookAppointmentTool = (FROM, TO, IS_APPOINTMENT_EMAIL,JOB_ID) => ({
   temporaryTool: {
     modelToolName: "bookAppointment",
     description: "Schedule appointments",
@@ -366,6 +366,7 @@ const bookAppointmentTool = (FROM, TO, IS_APPOINTMENT_EMAIL) => ({
       { "name": "isAppointEmail", "location": "PARAMETER_LOCATION_BODY", "value": IS_APPOINTMENT_EMAIL },
       { "name": "intent_from", "location": "PARAMETER_LOCATION_BODY", "value": "outbound Appointment" },
       { "name": "direction", "location": "PARAMETER_LOCATION_BODY", "value": "OUTBOUND" },
+      { "name": "job_id", "location": "PARAMETER_LOCATION_BODY", value: JOB_ID },
     ],
     automaticParameters: [{
       "name": "callId",
@@ -374,9 +375,9 @@ const bookAppointmentTool = (FROM, TO, IS_APPOINTMENT_EMAIL) => ({
     }],
     dynamicParameters: [       
       { name: "firstname", location: "PARAMETER_LOCATION_BODY", schema: { type: "string" }, required: true },
-      { name: "lastname", location: "PARAMETER_LOCATION_BODY", schema: { type: "string" }, required: true },
+      { name: "lastname", location: "PARAMETER_LOCATION_BODY", schema: { type: "string" }, required: false },
       { name: "contactnumber", location: "PARAMETER_LOCATION_BODY", schema: { type: "string" }, required: true },
-      { name: "emailaddress", location: "PARAMETER_LOCATION_BODY", schema: { type: "string" }, required: true },
+      { name: "emailaddress", location: "PARAMETER_LOCATION_BODY", schema: { type: "string" }, required: false },
       { name: "purpose", location: "PARAMETER_LOCATION_BODY", schema: { type: "string" }, required: true },
       { name: "appointmentdate", location: "PARAMETER_LOCATION_BODY", schema: { type: "string", format: "date" }, required: true },
       { name: "appointmenttime", location: "PARAMETER_LOCATION_BODY", schema: { type: "string", format: "time" }, required: true },
@@ -486,7 +487,7 @@ function createSelectedTools(
   is_taking_notes, is_appointment_reminder,
   JOB_ID,
   use_knowlege_base,
-  knowlege_base_id
+  knowlege_base_id  
 ) {
   
   console.log('Creating selected tools with use_knowlege_base:', use_knowlege_base, 'and knowlege_base_id:', knowlege_base_id);
@@ -504,7 +505,7 @@ function createSelectedTools(
   
   // Add book appointment tool only if enabled
   if (is_book_appointment === true || is_book_appointment === 1 || is_book_appointment === "1") {
-      tools.push(bookAppointmentTool(FROM, TO, is_book_appointment));
+      tools.push(bookAppointmentTool(FROM, TO, is_book_appointment,JOB_ID));
   }
 
   // Always add hang up call tool
@@ -684,7 +685,7 @@ export function buildUltravoxCallConfig(job, ai_tags_dictionary, ai_settings) {
         job.is_book_appointment, job.is_transfercall, job.transfercall_mobileno,
         job.companyname, COMPANYID,
         job.is_taking_notes, job.is_appointment_reminder, // Fixed: these were undefined variables
-        job.knowlege_base_id, job.use_knowlege_base
+        JOB_ID,job.knowlege_base_id, job.use_knowlege_base
       );
       logMessage('Selected tools built successfully, count:', selectedTools?.length);
     } catch (toolsError) {
