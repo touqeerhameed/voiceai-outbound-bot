@@ -264,7 +264,8 @@ router.post('/bookAppointment', async (req, res) => {
   await log_incoming_call_request('Webhook /bookAppointment: ',  null,JSON.stringify(req.body));
 
   const booking = await createBooking(req.body);
-  console.log('Booking response:', booking);
+  logMessage('Booking response:', JSON.stringify(booking, null, 2));
+  // console.log('Booking response:', booking);
   res.json(booking);
 });
 

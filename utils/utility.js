@@ -161,7 +161,7 @@ function PROMPT_EXPLICIT_REPLACEMENT(prompt, is_record_disclaimer, record_discla
 function PROMPT_REPLACEMENT(prompt, FROM, ai_tags_dictionary)
  {
   try {
-    // 1. Get UK time with BST/GMT awareness  
+    // 1. Get UK time with BST/GMT awareness
     const ukDateOptions = {
       timeZone: 'Europe/London',
       year: 'numeric',
@@ -180,18 +180,48 @@ function PROMPT_REPLACEMENT(prompt, FROM, ai_tags_dictionary)
       hour: '2-digit',
       minute: '2-digit'
     };
-     
+
     // 2. Format dates/times explicitly for UK
     const currentDate = new Date().toLocaleDateString('en-GB', ukDateOptions)
       .split('/').reverse().join('-'); // Converts DD/MM/YYYY → YYYY-MM-DD
     const currentTime12h = new Date().toLocaleTimeString('en-GB', ukTimeOptions12h);
     const currentTime24h = new Date().toLocaleTimeString('en-GB', ukTimeOptions24h);
 
+    // 3. Get timezone abbreviation (GMT or BST)
+    const currentTimezone = new Date().toLocaleTimeString('en-GB', {
+      timeZone: 'Europe/London',
+      timeZoneName: 'short'
+    }).split(' ').pop(); // Extracts "GMT" or "BST"
+
+    // 4. Get day of week
+    const currentDayOfWeek = new Date().toLocaleDateString('en-GB', {
+      timeZone: 'Europe/London',
+      weekday: 'long'
+    });
+
+    // 5. Calculate tomorrow's date and day
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowDate = tomorrow.toLocaleDateString('en-GB', ukDateOptions)
+      .split('/').reverse().join('-'); // YYYY-MM-DD format
+    const tomorrowDayOfWeek = tomorrow.toLocaleDateString('en-GB', {
+      timeZone: 'Europe/London',
+      weekday: 'long'
+    });
+
+    // 6. Location constant
+    // const location = "London, UK";
+
     // Replace system tags first
     prompt = prompt
       .replace(/\[CURRENT_DATE_YYYY-MM-DD\]/g, currentDate)
       .replace(/\[CURRENT_TIME_HH:MM \(12h\)\]/g, currentTime12h)
       .replace(/\[CURRENT_TIME_HH:MM \(24h\)\]/g, currentTime24h)
+      .replace(/\[TIMEZONE\]/g, currentTimezone)
+      .replace(/\[CURRENT_DAY\]/g, currentDayOfWeek)
+      .replace(/\[TOMORROW_DATE_YYYY-MM-DD\]/g, tomorrowDate)
+      .replace(/\[TOMORROW_DAY\]/g, tomorrowDayOfWeek)
+      // .replace(/\[LOCATION\]/g, location)
       .replace(/\[CALLERPHONENO\]/g, FROM);   
         
     // 3. Replace AI tags if ai_tags_dictionary is available

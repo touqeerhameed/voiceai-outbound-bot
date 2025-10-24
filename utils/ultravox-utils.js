@@ -693,13 +693,39 @@ export function buildUltravoxCallConfig(job, ai_tags_dictionary, ai_settings) {
       throw new Error(`Failed to build selected tools: ${toolsError.message}`);
     }
 
-    // Build final configuration object
+    // Build final configuration object with dynamic Ultravox performance settings
     const config = {
       systemPrompt: FINAL_PROMPT,
       model: 'fixie-ai/ultravox',
       voice: job.voice || 'en-GB-Neural2-A',
       temperature: job.temperature ?? 0.3,
       firstSpeaker: 'FIRST_SPEAKER_AGENT',
+
+      // Language hint from AI Settings
+      languageHint: ai_settings?.language_hint || "en-GB",
+
+      // Join timeout from AI Settings (format: "20s" for 20 seconds)
+      joinTimeout: `${ai_settings?.join_timeout || 20}s`,
+
+      // Voice Activity Detection settings from AI Settings (convert milliseconds to seconds with 's' suffix)
+      /*vadSettings: ai_settings?.vad_settings ? {
+        turnEndpointDelay: `${ai_settings.vad_settings.turn_endpoint_delay / 1000}s`,
+        minimumTurnDuration: `${ai_settings.vad_settings.minimum_turn_duration / 1000}s`,
+        minimumInterruptionDuration: `${ai_settings.vad_settings.minimum_interruption_duration / 1000}s`
+      } : undefined,
+       */ 
+      // Inactivity messages from AI Settings
+      
+      /*
+      inactivityMessages: ai_settings?.inactivity_messages ?
+        ai_settings.inactivity_messages.map(msg => ({
+          duration: `${msg.duration_seconds}s`,
+          message: msg.message
+        })) : undefined,
+      */
+      // Time exceeded message from AI Settings
+      timeExceededMessage: ai_settings?.time_exceeded_message,
+
       medium: {
         twilio: {
           // You can add voiceSettings here if needed
@@ -711,16 +737,18 @@ export function buildUltravoxCallConfig(job, ai_tags_dictionary, ai_settings) {
       selectedTools: selectedTools,
       metadata: {
         direction: "OUTBOUND",
-        company: job.companyname,
-        callfrom: FROM,
-        callto: TO,
-        ISCALLTRANSCRIPT: Istscriptstring,
-        ISCALLRECORDING: IsRecordingstring,
-        COMPANYID: job.business_id,
-        EMAILADDRESS: job.emailaddress,
-        JOB_EMAILADDRESS: job.job_email_address,
-        EMAILNOTIFICAION: IsEmailnotistring,
-        JOB_ID: job.job_id,
+        company: String(job.companyname || ''),
+        callfrom: String(FROM || ''),
+        callto: String(TO || ''),
+        ISCALLTRANSCRIPT: String(Istscriptstring || ''),
+        ISCALLRECORDING: String(IsRecordingstring || ''),
+        COMPANYID: String(job.business_id || ''),
+        EMAILADDRESS: String(job.emailaddress || ''),
+        JOB_EMAILADDRESS: String(job.job_email_address || ''),
+        EMAILNOTIFICAION: String(IsEmailnotistring || ''),
+        JOB_ID: String(job.job_id || ''),
+        LANGUAGE_LOCALE: String(ai_settings?.language_hint || "en-GB"),
+        UNIX_TIMESTAMP: String(Date.now())
       }
     };
 
